@@ -49,7 +49,7 @@ if tokenEntry.processorName == processorName and tokenEntry.segment == segment t
         redis.call('HMSET', processorNameSegment, 'owner', tokenEntry.owner, 'timestamp', tokenEntry.timestamp, 'token', tokenEntry.token, 'tokenType', tokenEntry.tokenType)
         return true
     else
-        return nil
+        return false
     end
 else
     tokenEntry.processorName = processorName
