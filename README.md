@@ -1,4 +1,4 @@
-## axon-redis
+## axon-redis [![Build Status](https://travis-ci.org/be-cloudway/axon-redis.svg?branch=master)](https://travis-ci.org/be-cloudway/axon-redis)
 
 An [Axon Framework](https://github.com/AxonFramework/AxonFramework) Redis token repository implementation.
 
