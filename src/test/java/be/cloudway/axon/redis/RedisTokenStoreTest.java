@@ -87,11 +87,19 @@ public class RedisTokenStoreTest {
     }
 
     @Test
-    public void testClaimConcurrentStoreToken() {
+    public void testClaimConcurrentFetchToken() {
         redisTokenStore.fetchToken("processor1", 0);
         redisTokenStore.storeToken(GapAwareTrackingToken.newInstance(1337L, Collections.emptySortedSet()), "processor1", 0);
 
         assertThatThrownBy(() -> concurrentRedisTokenStore.fetchToken("processor1", 0)).isInstanceOf(UnableToClaimTokenException.class);
+    }
+
+    @Test
+    public void testClaimConcurrentStoreToken() {
+        redisTokenStore.fetchToken("processor1", 0);
+        redisTokenStore.storeToken(GapAwareTrackingToken.newInstance(1337L, Collections.emptySortedSet()), "processor1", 0);
+
+        assertThatThrownBy(() -> concurrentRedisTokenStore.storeToken(GapAwareTrackingToken.newInstance(7331L, Collections.emptySortedSet()), "processor1", 0)).isInstanceOf(UnableToClaimTokenException.class);
     }
 
     @Test

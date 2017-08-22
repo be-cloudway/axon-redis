@@ -60,7 +60,11 @@ public class RedisTokenStore implements TokenStore {
     public void storeToken(TrackingToken token, String processorName, int segment) throws UnableToClaimTokenException {
         RedisTokenEntry redisTokenEntry = new RedisTokenEntry(token, serializer, processorName, segment);
         redisTokenEntry.claim(nodeId, claimTimeout);
-        redisTokenRepository.storeTokenEntry(redisTokenEntry, redisTokenEntry.timestamp().minus(claimTimeout));
+        boolean storedWithClaim = redisTokenRepository.storeTokenEntry(redisTokenEntry, redisTokenEntry.timestamp().minus(claimTimeout));
+
+        if(!storedWithClaim) {
+            throw new UnableToClaimTokenException("Unable to claim token.");
+        }
     }
 
     @Override

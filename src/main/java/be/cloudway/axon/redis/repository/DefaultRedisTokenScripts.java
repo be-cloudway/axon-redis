@@ -70,7 +70,7 @@ public class DefaultRedisTokenScripts {
             "        redis.call('HMSET', processorNameSegment, 'owner', tokenEntry.owner, 'timestamp', tokenEntry.timestamp, 'token', tokenEntry.token, 'tokenType', tokenEntry.tokenType)\n" +
             "        return true\n" +
             "    else\n" +
-            "        return nil\n" +
+            "        return false\n" +
             "    end\n" +
             "else\n" +
             "    tokenEntry.processorName = processorName\n" +
