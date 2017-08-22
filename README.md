@@ -4,4 +4,15 @@ An [Axon Framework](https://github.com/AxonFramework/AxonFramework) Redis token 
 
 ### Usage
 
-TODO
+```java
+
+    @Bean
+    public JedisPool jedisPool() {
+        return new JedisPool(HOST, PORT);
+    }
+
+    @Bean
+    public TokenStore tokenStore(JedisPool jedisPool, XStreamSerializer xStreamSerializer) {
+        return new RedisTokenStore(new DefaultRedisTokenRepository(jedisPool), xStreamSerializer);
+    }
+```
