@@ -38,9 +38,6 @@ if tokenEntry.processorName == processorName and tokenEntry.segment == segment t
         tokenEntry.owner = owner
         tokenEntry.timestamp = timestamp
         redis.call('HMSET', processorNameSegment, 'owner', tokenEntry.owner, 'timestamp', tokenEntry.timestamp)
-        return cjson.encode(tokenEntry)
-    else
-        return nil
     end
 else
     tokenEntry.processorName = processorName
@@ -48,5 +45,6 @@ else
     tokenEntry.owner = owner
     tokenEntry.timestamp = timestamp
     redis.call('HMSET', processorNameSegment, 'processorName', tokenEntry.processorName, 'segment', tokenEntry.segment, 'owner', tokenEntry.owner, 'timestamp', tokenEntry.timestamp)
-    return cjson.encode(tokenEntry)
 end
+
+return cjson.encode(tokenEntry)

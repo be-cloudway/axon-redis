@@ -40,8 +40,8 @@ public class DefaultRedisTokenRepository implements RedisTokenRepository {
     }
 
     @Override
-    public boolean storeTokenEntry(RedisTokenEntry tokenEntry, Instant expirationFromTimestamp) {
-        Long value = (Long) tryEvalSha1(STORE_TOKEN_SCRIPT, STORE_TOKEN_SHA1,
+    public RedisTokenEntry storeTokenEntry(RedisTokenEntry tokenEntry, Instant expirationFromTimestamp) {
+        String redisOutput = (String) tryEvalSha1(STORE_TOKEN_SCRIPT, STORE_TOKEN_SHA1,
                 getHashKeyList(tokenEntry.getProcessorName(), tokenEntry.getSegment()),
                 Arrays.asList(
                         tokenEntry.getProcessorName(),
@@ -51,7 +51,8 @@ public class DefaultRedisTokenRepository implements RedisTokenRepository {
                         Long.toString(expirationFromTimestamp.toEpochMilli()),
                         Base64.getEncoder().encodeToString(tokenEntry.getSerializedToken().getData()),
                         tokenEntry.getSerializedToken().getType().getName()));
-        return Objects.equals(value, TRUE);
+
+        return mapRedisTokenEntry(redisOutput);
     }
 
     @Override
@@ -66,6 +67,42 @@ public class DefaultRedisTokenRepository implements RedisTokenRepository {
                         Long.toString(currentTimestamp.toEpochMilli()),
                         Long.toString(expirationFromTimestamp.toEpochMilli())));
 
+        return mapRedisTokenEntry(redisOutput);
+    }
+
+    @Override
+    public boolean releaseClaim(String processorName, int segment, String owner) {
+        Long value = (Long) tryEvalSha1(RELEASE_TOKEN_SCRIPT, RELEASE_TOKEN_SHA1,
+                getHashKeyList(processorName, segment),
+                Arrays.asList(
+                        processorName,
+                        Integer.toString(segment), owner));
+
+        return Objects.equals(value, TRUE);
+    }
+
+    /**
+     * Utility method returning a singleton list containing a String with a colon separated processorName and segment.
+     *
+     * @param processorName The name of the process for which to store the token
+     * @param segment       The index of the segment for which to store the token
+     * @return              Singleton list containing a String with a colon separated processorName and segment
+     */
+    private List<String> getHashKeyList(String processorName, int segment) {
+        return Collections.singletonList(processorName + ":" + segment);
+    }
+
+    private Object tryEvalSha1(String script, String sha1, List<String> keys, List<String> args) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            try {
+                return jedis.evalsha(sha1, keys, args);
+            } catch (JedisNoScriptException e) {
+                return jedis.eval(script, keys, args);
+            }
+        }
+    }
+
+    private RedisTokenEntry mapRedisTokenEntry(String redisOutput) {
         if (redisOutput != null) {
             JSONObject tokenEntry = new JSONObject(redisOutput);
 
@@ -99,38 +136,6 @@ public class DefaultRedisTokenRepository implements RedisTokenRepository {
                     tokenEntryOwner, tokenEntryProcessorName, tokenEntrySegment);
         } else {
             return null;
-        }
-    }
-
-    @Override
-    public boolean releaseClaim(String processorName, int segment, String owner) {
-        Long value = (Long) tryEvalSha1(RELEASE_TOKEN_SCRIPT, RELEASE_TOKEN_SHA1,
-                getHashKeyList(processorName, segment),
-                Arrays.asList(
-                        processorName,
-                        Integer.toString(segment), owner));
-
-        return Objects.equals(value, TRUE);
-    }
-
-    /**
-     * Utility method returning a singleton list containing a String with a colon separated processorName and segment.
-     *
-     * @param processorName The name of the process for which to store the token
-     * @param segment       The index of the segment for which to store the token
-     * @return              Singleton list containing a String with a colon separated processorName and segment
-     */
-    private List<String> getHashKeyList(String processorName, int segment) {
-        return Collections.singletonList(processorName + ":" + segment);
-    }
-
-    private Object tryEvalSha1(String script, String sha1, List<String> keys, List<String> args) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            try {
-                return jedis.evalsha(sha1, keys, args);
-            } catch (JedisNoScriptException e) {
-                return jedis.eval(script, keys, args);
-            }
         }
     }
 }

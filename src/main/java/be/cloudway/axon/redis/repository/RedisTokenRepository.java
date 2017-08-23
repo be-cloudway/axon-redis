@@ -17,9 +17,9 @@ public interface RedisTokenRepository {
      *
      * @param tokenEntry                The token entry that should be stored
      * @param expirationFromTimestamp   The timestamp from which an existing token entry claim would be regarded as expired.
-     * @return                          If the token was successfully stored, return true, otherwise false.
+     * @return                          RedisTokenEntry representation of the current Redis stored token entry.
      */
-    boolean storeTokenEntry(RedisTokenEntry tokenEntry, Instant expirationFromTimestamp);
+    RedisTokenEntry storeTokenEntry(RedisTokenEntry tokenEntry, Instant expirationFromTimestamp);
 
     /**
      *
@@ -28,7 +28,7 @@ public interface RedisTokenRepository {
      * @param owner                     The current nodeId
      * @param timestamp                 The timestamp to be used when storing the token entry
      * @param expirationFromTimestamp   The timestamp from which an existing token entry claim would be regarded as expired.
-     * @return                          RedisTokenEntry representation of the Redis stored token entry
+     * @return                          RedisTokenEntry representation of the current Redis stored token entry.
      */
     RedisTokenEntry fetchTokenEntry(String processorName, int segment, String owner, Instant timestamp, Instant expirationFromTimestamp);
 

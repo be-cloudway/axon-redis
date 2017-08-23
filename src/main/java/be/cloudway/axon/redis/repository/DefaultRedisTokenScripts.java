@@ -28,9 +28,6 @@ public class DefaultRedisTokenScripts {
             "        tokenEntry.owner = owner\n" +
             "        tokenEntry.timestamp = timestamp\n" +
             "        redis.call('HMSET', processorNameSegment, 'owner', tokenEntry.owner, 'timestamp', tokenEntry.timestamp)\n" +
-            "        return cjson.encode(tokenEntry)\n" +
-            "    else\n" +
-            "        return nil\n" +
             "    end\n" +
             "else\n" +
             "    tokenEntry.processorName = processorName\n" +
@@ -38,10 +35,11 @@ public class DefaultRedisTokenScripts {
             "    tokenEntry.owner = owner\n" +
             "    tokenEntry.timestamp = timestamp\n" +
             "    redis.call('HMSET', processorNameSegment, 'processorName', tokenEntry.processorName, 'segment', tokenEntry.segment, 'owner', tokenEntry.owner, 'timestamp', tokenEntry.timestamp)\n" +
-            "    return cjson.encode(tokenEntry)\n" +
-            "end\n";
+            "end\n" +
+            "\n" +
+            "return cjson.encode(tokenEntry)\n";
 
-    public static final String FETCH_TOKEN_SHA1 = "76559765f2fc122541419d31031df501a86ca824";
+    public static final String FETCH_TOKEN_SHA1 = "548196ccbcf749d06b31f0d6be7a7f23055b5e1f";
 
     public static final String STORE_TOKEN_SCRIPT =
             "local processorNameSegment = KEYS[1]\n" +
@@ -68,9 +66,6 @@ public class DefaultRedisTokenScripts {
             "        tokenEntry.token = token\n" +
             "        tokenEntry.tokenType = tokenType\n" +
             "        redis.call('HMSET', processorNameSegment, 'owner', tokenEntry.owner, 'timestamp', tokenEntry.timestamp, 'token', tokenEntry.token, 'tokenType', tokenEntry.tokenType)\n" +
-            "        return true\n" +
-            "    else\n" +
-            "        return false\n" +
             "    end\n" +
             "else\n" +
             "    tokenEntry.processorName = processorName\n" +
@@ -80,12 +75,13 @@ public class DefaultRedisTokenScripts {
             "    tokenEntry.token = token\n" +
             "    tokenEntry.tokenType = tokenType\n" +
             "    redis.call('HMSET', processorNameSegment, 'processorName', tokenEntry.processorName, 'segment', tokenEntry.segment, 'owner', tokenEntry.owner, 'timestamp', tokenEntry.timestamp, 'token', tokenEntry.token, 'tokenType', tokenEntry.tokenType)\n" +
-            "    return true\n" +
-            "end\n";
+            "end\n" +
+            "\n" +
+            "return cjson.encode(tokenEntry)\n";
 
-    public static final String STORE_TOKEN_SHA1 = "55bd0b99444f2ecd9930b373fce37ced9aa94ad9";
+    public static final String STORE_TOKEN_SHA1 = "eab683f2814c41c0ebdf57ce13fe9ce6b97eba1e";
 
-    public static final String RELEASE_TOKEN_SCRIPT =
+    public static final String RELEASE_TOKEN_SCRIPT = "" +
             "local processorNameSegment = KEYS[1]\n" +
             "local processorName = ARGV[1]\n" +
             "local segment = ARGV[2]\n" +

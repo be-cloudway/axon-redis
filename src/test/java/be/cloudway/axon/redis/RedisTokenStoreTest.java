@@ -49,7 +49,9 @@ public class RedisTokenStoreTest {
     public void testConcurrentFetch() {
         redisTokenStore.fetchToken("processor1", 0);
 
-        assertThatThrownBy(() -> concurrentRedisTokenStore.fetchToken("processor1", 0)).isInstanceOf(UnableToClaimTokenException.class);
+        assertThatThrownBy(() -> concurrentRedisTokenStore.fetchToken("processor1", 0))
+                .isInstanceOf(UnableToClaimTokenException.class)
+                .hasMessage("Unable to claim token 'processor1[0]'. It is owned by 'node1'");
     }
 
     @Test
@@ -91,7 +93,9 @@ public class RedisTokenStoreTest {
         redisTokenStore.fetchToken("processor1", 0);
         redisTokenStore.storeToken(GapAwareTrackingToken.newInstance(1337L, Collections.emptySortedSet()), "processor1", 0);
 
-        assertThatThrownBy(() -> concurrentRedisTokenStore.fetchToken("processor1", 0)).isInstanceOf(UnableToClaimTokenException.class);
+        assertThatThrownBy(() -> concurrentRedisTokenStore.fetchToken("processor1", 0))
+                .isInstanceOf(UnableToClaimTokenException.class)
+                .hasMessage("Unable to claim token 'processor1[0]'. It is owned by 'node1'");
     }
 
     @Test
@@ -99,7 +103,9 @@ public class RedisTokenStoreTest {
         redisTokenStore.fetchToken("processor1", 0);
         redisTokenStore.storeToken(GapAwareTrackingToken.newInstance(1337L, Collections.emptySortedSet()), "processor1", 0);
 
-        assertThatThrownBy(() -> concurrentRedisTokenStore.storeToken(GapAwareTrackingToken.newInstance(7331L, Collections.emptySortedSet()), "processor1", 0)).isInstanceOf(UnableToClaimTokenException.class);
+        assertThatThrownBy(() -> concurrentRedisTokenStore.storeToken(GapAwareTrackingToken.newInstance(7331L, Collections.emptySortedSet()), "processor1", 0))
+                .isInstanceOf(UnableToClaimTokenException.class)
+                .hasMessage("Unable to claim token 'processor1[0]'. It is owned by 'node1'");
     }
 
     @Test
